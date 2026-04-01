@@ -1,6 +1,6 @@
 import "@/app/globals.css"
-import { SiteFooter } from "@/components/layout/SiteFooter"
-import { SiteHeader } from "@/components/layout/SiteHeader"
+import { SiteFooter } from "@/components/layout/site-footer"
+import { SiteHeader } from "@/components/layout/site-header"
 import Providers from "@/components/providers"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"

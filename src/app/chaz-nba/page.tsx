@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { VideoModal } from "@/components/youtube/VideoModal"
+import { VideoModal } from "@/components/youtube/video-modal"
 import { getChazNBAVideos } from "@/lib/services/youtubeService"
 import { Play } from "lucide-react"
 import Link from "next/link"

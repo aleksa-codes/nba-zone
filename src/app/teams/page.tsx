@@ -1,4 +1,4 @@
-import { TeamCard } from "@/components/teams/TeamCard"
+import { TeamCard } from "@/components/teams/team-card"
 import { getAllTeams } from "@/lib/services/espnService"
 import { Trophy } from "lucide-react"
 

@@ -7,7 +7,7 @@ import { format } from "date-fns"
 import { CalendarDays, RefreshCw } from "lucide-react"
 import { useEffect } from "react"
 import { Button } from "../ui/button"
-import { MatchCard, MatchCardSkeleton } from "./MatchCard"
+import { MatchCard, MatchCardSkeleton } from "./match-card"
 
 export function MatchBoard({ initialData }: { initialData: Game[] }) {
   const { data, isLoading, isFetching, refetch } = useQuery({

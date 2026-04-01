@@ -1,4 +1,4 @@
-import { MatchBoard } from "@/components/matches/MatchBoard"
+import { MatchBoard } from "@/components/matches/match-board"
 import { getTodaysMatches } from "@/lib/services/espnService"
 import { Game } from "@/types"
 import {
