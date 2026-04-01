@@ -132,4 +132,7 @@
   html {
     @apply font-sans;
   }
+  button {
+    @apply hover:cursor-pointer;
+  }
 }
