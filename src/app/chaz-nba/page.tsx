@@ -12,7 +12,8 @@ export const metadata = {
 export const revalidate = 3600 // 1 hour
 
 export default async function ChazNBAPage() {
-  const videos = await getChazNBAVideos()
+  const allVideos = await getChazNBAVideos()
+  const videos = allVideos.slice(0, 12)
 
   return (
     <div className="container py-8">
@@ -25,7 +26,7 @@ export default async function ChazNBAPage() {
             Chaz NBA
           </h1>
           <p className="mt-4 text-lg font-medium text-muted-foreground">
-            Recent analysis and coverage. Showing the latest 15 videos from
+            Recent analysis and coverage. Showing the latest 12 videos from
             YouTube&apos;s best NBA channel.
           </p>
         </div>
