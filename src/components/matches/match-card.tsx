@@ -28,9 +28,12 @@ export function MatchCard({ game }: { game: Game }) {
         }}
       />
       {isLive && (
-        <div className="absolute top-3 right-3 h-3 w-3">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75"></span>
-          <span className="relative inline-flex h-3 w-3 rounded-full bg-destructive"></span>
+        <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-bold tracking-wide text-destructive">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75"></span>
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-destructive"></span>
+          </span>
+          LIVE
         </div>
       )}
       <CardContent className="grid grid-cols-[1fr_auto_1fr] items-center gap-6 p-6">
