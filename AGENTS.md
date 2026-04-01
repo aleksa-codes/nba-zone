@@ -21,7 +21,7 @@ src/
 ├── app/              # App Router pages (standings, teams/[teamId], news)
 │   ├── globals.css   # Tailwind v4 imports + theme CSS variables
 │   └── layout.tsx    # Root layout with next-themes ThemeProvider
-├── components/       # Custom components (e.g., layout/SiteHeader.tsx)
+├── components/       # Custom components (e.g., layout/site-header.tsx)
 │   └── ui/           # Auto-generated shadcn components (DO NOT MODIFY DIRECTLY)
 └── lib/
     ├── services/     # Data fetching services (standingsService.ts, youtubeService.ts, etc.)
@@ -44,6 +44,7 @@ src/
 - **Default to Server Components:** Omit `'use client'` unless the component requires interactivity, hooks, or browser APIs. All server-side data fetching must happen in Server Components using `await fetch(..., { next: { revalidate: 3600 } })` (Incremental Static Regeneration). Use TanStack React Query for complex client-side data fetching, polling, or mutations.
 - **AVOID `useEffect`:** Do NOT use `useEffect` unless absolutely necessary (e.g., syncing with non-React external systems). Prefer derived state, event handlers, or React 19 features.
 - **React Compiler is ENABLED:** Do NOT manually use `useMemo` or `useCallback` unless specifically required for bypassing a compiler limitation. The compiler handles memoization.
+- **File Naming Conventions:** Use **kebab-case** for all component files (e.g., `site-header.tsx`, `team-card.tsx`). Services and utilities should remain `camelCase`.
 
 ### Styling & Theming
 
