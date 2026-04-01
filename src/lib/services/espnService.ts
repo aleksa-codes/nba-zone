@@ -1,7 +1,6 @@
 import {
   EspnCompetitor,
   EspnEvent,
-  EspnResponse,
   EspnRosterResponse,
   Game,
   NbaTeam,
@@ -151,34 +150,46 @@ const fetchAndMapRosterInjuries = async (games: Game[]): Promise<Game[]> => {
   }
 }
 
-export const getTodaysMatches = async (): Promise<Game[]> => {
+export const getMatchesByDate = async (date: Date): Promise<Game[]> => {
   try {
-    const today = new Date()
-    // Format YYYYMMDD
-    const year = today.getFullYear()
-    const month = String(today.getMonth() + 1).padStart(2, "0")
-    const day = String(today.getDate()).padStart(2, "0")
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const day = String(date.getDate()).padStart(2, "0")
     const dateString = `${year}${month}${day}`
 
-    // Add cache buster
     const response = await fetch(
       `${ESPN_SCOREBOARD_API_URL}?dates=${dateString}&limit=100&cb=${new Date().getTime()}`
     )
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    const data: EspnResponse = await response.json()
+
+    // Quick typings hack since EspnResponse isn't fully exported maybe
+    const data = await response.json()
     const espnGames = data.events.map(mapEventToGame)
 
-    // Only fetch injuries for teams playing today to save bandwidth
-    const enrichedGames = await fetchAndMapRosterInjuries(espnGames)
+    const isToday = date.toDateString() === new Date().toDateString()
+    if (isToday) {
+      return await fetchAndMapRosterInjuries(espnGames)
+    }
 
-    return enrichedGames
+    return espnGames
   } catch (error) {
     console.error("Failed to fetch matches from ESPN:", error)
     throw error
   }
 }
+
+export const getTodaysMatches = async (): Promise<Game[]> => {
+  return getMatchesByDate(new Date())
+}
+
+export const getYesterdaysMatches = async (): Promise<Game[]> => {
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  return getMatchesByDate(yesterday)
+}
+
 export const getAllTeams = async (): Promise<NbaTeam[]> => {
   try {
     const response = await fetch(
