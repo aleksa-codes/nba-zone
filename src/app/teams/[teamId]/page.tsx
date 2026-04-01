@@ -365,18 +365,13 @@ export default async function TeamPage({
                       <TableRow key={player.id}>
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-3">
-                            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border bg-muted/20">
+                            <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border bg-muted/20">
                               {player.headshot?.href ? (
                                 <Image
-                                  src={player.headshot.href.replace(
-                                    /w=\d+&h=\d+/g,
-                                    "w=256&h=256"
-                                  )}
+                                  src={player.headshot.href}
                                   alt={player.fullName}
                                   fill
-                                  sizes="120px"
-                                  quality={100}
-                                  unoptimized
+                                  sizes="128px"
                                   className="scale-125 object-cover object-top"
                                 />
                               ) : (
