@@ -5,9 +5,10 @@ import {
   getTodaysMatches,
   getYesterdaysMatches,
 } from "@/lib/services/espnService"
+import { getNBADate } from "@/lib/utils"
 import { Game } from "@/types"
 import { useQuery } from "@tanstack/react-query"
-import { format, subDays } from "date-fns"
+import { format } from "date-fns"
 import { CalendarDays, RefreshCw } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Button } from "../ui/button"
@@ -71,7 +72,7 @@ export function MatchBoard({
   }
 
   // Format dates visually safely
-  const titleDate = isToday ? new Date() : subDays(new Date(), 1)
+  const titleDate = isToday ? getNBADate(0) : getNBADate(-1)
   const displayTitle = mounted ? format(titleDate, "EEEE, MMMM do") : ""
 
   // Extra specific descriptors
@@ -99,10 +100,10 @@ export function MatchBoard({
                 value="yesterday"
                 className="px-5 text-sm font-medium"
               >
-                {mounted ? format(subDays(new Date(), 1), "MMM d") : "Yday"}
+                {mounted ? format(getNBADate(-1), "MMM d") : "Yday"}
               </TabsTrigger>
               <TabsTrigger value="today" className="px-5 text-sm font-medium">
-                {mounted ? format(new Date(), "MMM d") : "Today"}
+                {mounted ? format(getNBADate(0), "MMM d") : "Today"}
               </TabsTrigger>
             </TabsList>
           </Tabs>

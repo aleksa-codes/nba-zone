@@ -1,3 +1,4 @@
+import { getNBADate } from "@/lib/utils"
 import {
   EspnCompetitor,
   EspnEvent,
@@ -181,13 +182,11 @@ export const getMatchesByDate = async (date: Date): Promise<Game[]> => {
 }
 
 export const getTodaysMatches = async (): Promise<Game[]> => {
-  return getMatchesByDate(new Date())
+  return getMatchesByDate(getNBADate(0))
 }
 
 export const getYesterdaysMatches = async (): Promise<Game[]> => {
-  const yesterday = new Date()
-  yesterday.setDate(yesterday.getDate() - 1)
-  return getMatchesByDate(yesterday)
+  return getMatchesByDate(getNBADate(-1))
 }
 
 export const getAllTeams = async (): Promise<NbaTeam[]> => {
