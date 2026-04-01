@@ -1,8 +1,17 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getTeamDetails } from "@/lib/services/espnService"
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { getTeamDetails, getTeamRoster } from "@/lib/services/espnService"
+import {
+  Activity,
   ArrowUpRight,
   Calendar,
   ChevronLeft,
@@ -21,7 +30,11 @@ export default async function TeamPage({
   params: Promise<{ teamId: string }>
 }) {
   const { teamId } = await params
-  const teamInfo = await getTeamDetails(teamId)
+  const [teamInfo, roster] = await Promise.all([
+    getTeamDetails(teamId),
+    getTeamRoster(teamId),
+  ])
+
   const team = teamInfo as
     | Record<string, unknown>
     | null
@@ -81,6 +94,17 @@ export default async function TeamPage({
               {team.displayName}
             </h1>
             <div className="flex flex-wrap items-center justify-center gap-3 text-lg font-medium text-white/90 md:justify-start">
+              {team.location && (
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-5 w-5" /> {team.location}{" "}
+                  {team.abbreviation && (
+                    <span className="ml-1 text-sm opacity-75">
+                      ({team.abbreviation})
+                    </span>
+                  )}
+                </span>
+              )}
+              {team.location && <span className="opacity-50">•</span>}
               <span className="flex items-center gap-1">
                 <Trophy className="h-5 w-5" />{" "}
                 {team.record?.items?.[0]?.summary || "0-0"}
@@ -90,10 +114,7 @@ export default async function TeamPage({
               {team.franchise?.venue?.fullName && (
                 <>
                   <span className="opacity-50">•</span>
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-5 w-5" />{" "}
-                    {team.franchise.venue.fullName}
-                  </span>
+                  <span>{team.franchise.venue.fullName}</span>
                 </>
               )}
             </div>
@@ -125,41 +146,7 @@ export default async function TeamPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="border-border/50 bg-card shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="h-5 w-5 text-primary" /> Franchise Info
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm font-semibold text-muted-foreground">
-                  Location
-                </p>
-                <p className="text-lg font-medium">{team.location}</p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-muted-foreground">
-                  Abbreviation
-                </p>
-                <p className="text-lg font-medium">{team.abbreviation}</p>
-              </div>
-            </div>
-            {team.franchise?.venue?.fullName && (
-              <div>
-                <p className="text-sm font-semibold text-muted-foreground">
-                  Arena
-                </p>
-                <p className="text-lg font-medium">
-                  {team.franchise.venue.fullName}
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card className="border-border/50 bg-card shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -217,47 +204,247 @@ export default async function TeamPage({
           </CardContent>
         </Card>
 
-        {team.nextEvent && team.nextEvent[0] && (
-          <Card className="border-border/50 bg-card shadow-sm">
-            <CardHeader>
-              <CardTitle className="flex flex-col gap-1">
-                <span className="flex items-center gap-2 text-primary">
-                  <Calendar className="h-5 w-5" /> Next Game
-                </span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {team.nextEvent?.[0] ? (
-                <div className="flex flex-col gap-3">
-                  <div className="rounded-xl border bg-muted/30 p-4">
-                    <h4 className="flex items-center gap-2 text-lg font-bold">
-                      {team.nextEvent[0].shortName}
-                    </h4>
-                    <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      {new Date(team.nextEvent[0].date).toLocaleString(
-                        "en-US",
-                        {
-                          weekday: "short",
-                          month: "short",
-                          day: "numeric",
-                          hour: "numeric",
-                          minute: "2-digit",
-                        }
-                      )}
-                    </p>
+        {team.nextEvent &&
+          team.nextEvent[0] &&
+          (() => {
+            const evt = team.nextEvent[0]
+            const isHome =
+              evt.competitions[0].competitors.find(
+                (c: { id: string; homeAway?: string }) => c.id === team.id
+              )?.homeAway === "home"
+            const opponent = evt.competitions[0].competitors.find(
+              (c: { id: string; team?: Record<string, unknown> }) =>
+                c.id !== team.id
+            )?.team as Record<string, string | { href: string }[]> | undefined
+
+            return (
+              <Card
+                className="relative flex flex-col overflow-hidden border-border/50 bg-card shadow-sm"
+                style={{
+                  background: opponent?.color
+                    ? `linear-gradient(135deg, #${team.color}15 0%, transparent 40%, transparent 60%, #${opponent.color}15 100%)`
+                    : undefined,
+                }}
+              >
+                <div
+                  className="absolute inset-x-0 top-0 h-1 opacity-80"
+                  style={{
+                    background: opponent?.color
+                      ? `linear-gradient(to right, #${team.color}, #${opponent.color})`
+                      : undefined,
+                  }}
+                />
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center gap-2 font-bold text-primary">
+                      <Calendar className="h-5 w-5" /> Next Game
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className="bg-background/50 font-mono text-[10px] tracking-wider uppercase backdrop-blur-sm"
+                    >
+                      {isHome ? "HOME" : "AWAY"}
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-1 flex-col justify-center">
+                  <div className="flex items-center justify-between gap-4">
+                    {/* Home Team / Current Team setup */}
+                    <div className="flex w-1/3 flex-col items-center gap-2 text-center">
+                      <div className="relative h-16 w-16 drop-shadow-md">
+                        <Image
+                          src={
+                            isHome
+                              ? `https://a.espncdn.com/i/teamlogos/nba/500/${team.abbreviation.toLowerCase()}.png`
+                              : typeof opponent?.logos?.[0] === "string"
+                                ? opponent?.logos?.[0]
+                                : opponent?.logos?.[0]?.href || ""
+                          }
+                          alt="Team Logo"
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                      <span className="w-full truncate text-xs font-bold text-muted-foreground">
+                        {isHome
+                          ? team.abbreviation
+                          : opponent?.abbreviation || opponent?.displayName}
+                      </span>
+                    </div>
+
+                    {/* VS Info & Date */}
+                    <div className="flex w-1/3 flex-col items-center justify-center text-center">
+                      <span className="mb-2 text-xl font-bold text-muted-foreground/30">
+                        VS
+                      </span>
+                      <div className="flex flex-col items-center">
+                        <span className="text-base font-semibold tracking-tight text-foreground">
+                          {new Date(evt.date).toLocaleString("en-US", {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                        <span className="mt-0.5 text-xs font-medium whitespace-nowrap text-muted-foreground">
+                          {new Date(evt.date).toLocaleString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Away Team / Opponent setup */}
+                    <div className="flex w-1/3 flex-col items-center gap-2 text-center">
+                      <div className="relative h-16 w-16 drop-shadow-md">
+                        <Image
+                          src={
+                            !isHome
+                              ? `https://a.espncdn.com/i/teamlogos/nba/500/${team.abbreviation.toLowerCase()}.png`
+                              : typeof opponent?.logos?.[0] === "string"
+                                ? opponent?.logos?.[0]
+                                : opponent?.logos?.[0]?.href || ""
+                          }
+                          alt="Team Logo"
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                      <span className="w-full truncate text-xs font-bold text-muted-foreground">
+                        {!isHome
+                          ? team.abbreviation
+                          : opponent?.abbreviation || opponent?.displayName}
+                      </span>
+                    </div>
                   </div>
-                  <Badge variant="secondary" className="w-fit">
-                    Upcoming Match
-                  </Badge>
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  Schedule complete.
-                </p>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            )
+          })()}
+      </div>
+
+      <div className="mt-8">
+        <h3 className="mb-4 flex items-center gap-2 text-2xl font-bold tracking-tight">
+          <Activity className="h-6 w-6 text-primary" /> Active Roster
+        </h3>
+        {roster?.length ? (
+          <div className="overflow-hidden rounded-md border bg-card">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  <TableHead className="w-62.5">Player</TableHead>
+                  <TableHead>PTS</TableHead>
+                  <TableHead>REB</TableHead>
+                  <TableHead>AST</TableHead>
+                  <TableHead>Pos</TableHead>
+                  <TableHead>Height</TableHead>
+                  <TableHead>Weight</TableHead>
+                  <TableHead>Age</TableHead>
+                  <TableHead className="text-right">Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[...roster]
+                  .sort((a, b) => {
+                    const activeA = a.injuries && a.injuries.length > 0 ? 0 : 1
+                    const activeB = b.injuries && b.injuries.length > 0 ? 0 : 1
+                    if (activeA !== activeB) return activeB - activeA
+
+                    const ptsA = parseFloat(a.stats?.pts || "0") || 0
+                    const ptsB = parseFloat(b.stats?.pts || "0") || 0
+                    return ptsB - ptsA
+                  })
+                  .map((player) => {
+                    const isInjured =
+                      player.injuries && player.injuries.length > 0
+                    const injuryText = isInjured
+                      ? player.injuries![0].status
+                      : "Active"
+
+                    return (
+                      <TableRow key={player.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-3">
+                            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border bg-muted/20">
+                              {player.headshot?.href ? (
+                                <Image
+                                  src={player.headshot.href.replace(
+                                    /w=\d+&h=\d+/g,
+                                    "w=256&h=256"
+                                  )}
+                                  alt={player.fullName}
+                                  fill
+                                  sizes="120px"
+                                  quality={100}
+                                  unoptimized
+                                  className="scale-125 object-cover object-top"
+                                />
+                              ) : (
+                                <span className="font-bold text-muted-foreground/50">
+                                  {player.jersey || "?"}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-bold whitespace-nowrap">
+                                {player.fullName}
+                              </span>
+                              {player.jersey && (
+                                <span className="text-xs text-muted-foreground">
+                                  #{player.jersey}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-semibold whitespace-nowrap">
+                          {player.stats?.pts || "-"}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-muted-foreground">
+                          {player.stats?.reb || "-"}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-muted-foreground">
+                          {player.stats?.ast || "-"}
+                        </TableCell>
+                        <TableCell className="font-medium whitespace-nowrap text-muted-foreground">
+                          {player.position?.name || "-"}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-muted-foreground">
+                          {player.displayHeight || "-"}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-muted-foreground">
+                          {player.displayWeight || "-"}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-muted-foreground">
+                          {player.age || "-"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {isInjured ? (
+                            <Badge
+                              variant="destructive"
+                              className="ml-auto flex w-fit items-center gap-1.5 text-[10px] uppercase"
+                            >
+                              <Activity className="h-3 w-3" /> {injuryText}
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="secondary"
+                              className="ml-auto w-fit bg-emerald-500/10 text-[10px] font-bold text-emerald-600 uppercase hover:bg-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400"
+                            >
+                              Active
+                            </Badge>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-dashed bg-muted/20 py-12 text-center text-muted-foreground">
+            No active roster data available.
+          </div>
         )}
       </div>
     </div>

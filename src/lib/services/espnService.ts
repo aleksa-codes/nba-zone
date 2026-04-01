@@ -222,3 +222,62 @@ export const getTeamDetails = async (id: string): Promise<unknown> => {
     return null
   }
 }
+
+export const getTeamRoster = async (
+  id: string
+): Promise<EspnRosterResponse["athletes"]> => {
+  try {
+    const response = await fetch(
+      `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/${id}/roster`,
+      {
+        next: { revalidate: 3600 }, // Cache for 1 hour
+      }
+    )
+    if (!response.ok) throw new Error(`Failed to fetch team roster ${id}`)
+    const data = await response.json()
+    const athletes = data.athletes || []
+
+    // Fetch stats for each player
+    const athletesWithStats = await Promise.all(
+      athletes.map(async (athlete: EspnRosterResponse["athletes"][number]) => {
+        try {
+          const statsRes = await fetch(
+            `https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/${athlete.id}/overview`,
+            { next: { revalidate: 3600 } }
+          )
+          if (!statsRes.ok) return athlete
+
+          const statsData = await statsRes.json()
+          const splits = statsData?.statistics?.splits
+          if (!splits || splits.length === 0) return athlete
+
+          const split =
+            splits.find(
+              (s: Record<string, unknown>) =>
+                s.displayName === "Regular Season" || s.displayName === "Career"
+            ) || splits[0]
+          const labels = statsData.statistics.labels || []
+          const ptsIndex = labels.indexOf("PTS")
+          const rebIndex = labels.indexOf("REB")
+          const astIndex = labels.indexOf("AST")
+
+          return {
+            ...athlete,
+            stats: {
+              pts: ptsIndex > -1 ? split.stats[ptsIndex] : "-",
+              reb: rebIndex > -1 ? split.stats[rebIndex] : "-",
+              ast: astIndex > -1 ? split.stats[astIndex] : "-",
+            },
+          }
+        } catch {
+          return athlete
+        }
+      })
+    )
+
+    return athletesWithStats
+  } catch (error) {
+    console.error(`Failed to fetch team roster ${id}:`, error)
+    return []
+  }
+}

@@ -77,10 +77,27 @@ export interface EspnCompetitor {
 
 export interface EspnRosterResponse {
   athletes: {
+    id: string
     displayName: string
+    fullName: string
+    jersey?: string
+    displayHeight?: string
+    displayWeight?: string
+    age?: number
+    position?: {
+      name: string
+    }
+    headshot?: {
+      href: string
+    }
     injuries?: {
       status: string
     }[]
+    stats?: {
+      pts: string
+      reb: string
+      ast: string
+    }
   }[]
 }
 
@@ -113,4 +130,11 @@ export interface NbaTeam {
     isExternal: boolean
     isPremium: boolean
   }[]
+}
+
+export interface EspnPlayerOverview {
+  statistics?: {
+    labels: string[]
+    splits: { displayName: string; stats: string[] }[]
+  }
 }
