@@ -1,13 +1,4 @@
-import Parser from "rss-parser"
-
-const parser = new Parser({
-  customFields: {
-    item: [
-      ["media:group", "mediaGroup"],
-      ["yt:videoId", "videoId"],
-    ],
-  },
-})
+import { parseStringPromise } from "xml2js"
 
 export interface YouTubeVideo {
   id: string
@@ -21,20 +12,32 @@ export interface YouTubeVideo {
 export const getChazNBAVideos = async (): Promise<YouTubeVideo[]> => {
   try {
     const CHAZ_NBA_CHANNEL_ID = "UChgDp_uE5PVqnpdV05xKOOA"
-    const feed = await parser.parseURL(
-      `https://www.youtube.com/feeds/videos.xml?channel_id=${CHAZ_NBA_CHANNEL_ID}`
+    const res = await fetch(
+      `https://www.youtube.com/feeds/videos.xml?channel_id=${CHAZ_NBA_CHANNEL_ID}`,
+      { next: { revalidate: 3600 } }
     )
 
-    return feed.items.map((item) => {
-      // Cast the item to correctly shape RSS attributes
-      const customItem = item as unknown as Record<string, unknown>
+    if (!res.ok) {
+      throw new Error(`Failed to fetch youtube feed: ${res.statusText}`)
+    }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mediaGroup = customItem.mediaGroup as any
-      const thumbnail = mediaGroup?.["media:thumbnail"]?.[0]?.$?.url || ""
+    const text = await res.text()
+    const parsed = await parseStringPromise(text, { explicitArray: false })
+
+    if (!parsed?.feed?.entry) {
+      return []
+    }
+
+    const entries = Array.isArray(parsed.feed.entry)
+      ? parsed.feed.entry
+      : [parsed.feed.entry]
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return entries.map((item: any) => {
+      const mediaGroup = item["media:group"]
+      const thumbnail = mediaGroup?.["media:thumbnail"]?.$?.url || ""
       const rawViews =
-        mediaGroup?.["media:community"]?.[0]?.["media:statistics"]?.[0]?.$
-          ?.views || "0"
+        mediaGroup?.["media:community"]?.["media:statistics"]?.$?.views || "0"
 
       const formattedViews = new Intl.NumberFormat("en-US", {
         notation: "compact",
@@ -42,10 +45,10 @@ export const getChazNBAVideos = async (): Promise<YouTubeVideo[]> => {
       }).format(Number(rawViews))
 
       return {
-        id: (customItem.videoId as string) || "",
+        id: item["yt:videoId"] || "",
         title: item.title || "Untitled Video",
-        link: item.link || "",
-        pubDate: item.pubDate || new Date().toISOString(),
+        link: item.link?.$?.href || "",
+        pubDate: item.published || new Date().toISOString(),
         thumbnail: thumbnail,
         views: formattedViews,
       }
