@@ -34,9 +34,12 @@ src/
   - **Full API Documentation**: Checkout `espn-api-docs.md` in the root folder for a comprehensive list of all endpoints, parameters, and query options.
   - `https://site.api.espn.com/apis/v2/sports/basketball/nba/standings`
   - `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/[id]`
-  - Always map complex ESPN stats properties directly into strictly typed interfaces (e.g. `NbaTeamStanding`, `NbaTeamDetail`) in the `src/lib/services/` directory before passing to components.
-- **YouTube RSS Feeds**: Used for fetching latest NBA videos.
-  - We use standard `xml2js` to parse these XML feeds, targeting `media:statistics` for formatted view counts.
+  - `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/news?limit=50`: Use this for news (includes high-res thumbnails unlike RSS). IMPORTANT: Filter out `item.type === "Media"` to remove video-only items from text news feeds, and always handle sorting manually.
+  - Always map complex ESPN stats properties directly into strictly typed interfaces (e.g. `NbaTeamStanding`, `NbaTeamDetail`, `EspnArticle`) in the `src/lib/services/` directory before passing to components.
+- **YouTube Fetching Strategy**:
+  - **Playlists**: Use standard `https://www.youtube.com/feeds/videos.xml?playlist_id=[id]` and parse with `xml2js`, extracting `media:statistics` for views.
+  - **Channels**: DO NOT rely entirely on RSS feeds for full channel dumps because they are limited to 15 items and include Shorts which quickly push out long-form videos. We scrape `ytInitialData` instead.
+  - **Timezones**: Always append `?hl=en` to YouTube scraper URL endpoints (e.g., `/videos?hl=en`) to enforce English relative timestamps across dynamic serverless environments (like Vercel). Translate string dates dynamically (e.g., "5 hours ago") into exact ISO structures for proper chronological sorting.
 
 ## Strict AI Rules & Best Practices
 

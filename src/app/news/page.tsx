@@ -1,7 +1,8 @@
 import { getNBANews } from "@/lib/services/newsService"
 import { getNBADate } from "@/lib/utils"
-import { format } from "date-fns"
-import { ArrowRight, Clock, Flame, Newspaper } from "lucide-react"
+import { format, formatDistanceToNowStrict } from "date-fns"
+import { ArrowRight, Clock, Newspaper } from "lucide-react"
+import Image from "next/image"
 
 export const metadata = {
   title: "NBA News",
@@ -31,7 +32,6 @@ export default async function NewsPage() {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {" "}
         {articles.map((article, i) => (
           <a
             key={i}
@@ -40,41 +40,45 @@ export default async function NewsPage() {
             rel="noopener noreferrer"
             className="group flex flex-col focus-visible:outline-none"
           >
-            <div className="flex h-full flex-col rounded-xl border bg-card p-6 text-card-foreground shadow transition-colors hover:border-primary">
-              <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center rounded-md bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
-                  {i === 0 ? (
-                    <Flame className="mr-1.5 h-3.5 w-3.5 text-primary" />
-                  ) : (
+            <div className="flex h-full flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow transition-colors hover:border-primary">
+              {article.image && (
+                <div className="relative aspect-[3/2] w-full overflow-hidden bg-muted">
+                  <Image
+                    src={article.image}
+                    alt={article.title}
+                    fill
+                    className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
+              )}
+              <div className="flex flex-1 flex-col p-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center rounded-md bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
                     <Newspaper className="mr-1.5 h-3 w-3" />
-                  )}
-                  {i === 0 ? (
-                    <span className="font-bold text-primary">Top Story</span>
-                  ) : (
-                    article.source
-                  )}
+                    {article.source}
+                  </div>
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    <Clock className="mr-1 h-3 w-3" />
+                    {formatDistanceToNowStrict(new Date(article.pubDate), {
+                      addSuffix: true,
+                    })}
+                  </div>
                 </div>
-                <div className="flex items-center text-xs text-muted-foreground">
-                  <Clock className="mr-1 h-3 w-3" />
-                  {new Date(article.pubDate).toLocaleTimeString([], {
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
-                </div>
-              </div>
-              <h3 className="mb-4 text-xl leading-tight font-medium transition-colors group-hover:text-primary">
-                {article.title}
-              </h3>
+                <h3 className="mb-4 text-xl leading-tight font-medium transition-colors group-hover:text-primary">
+                  {article.title}
+                </h3>
 
-              <div className="mt-auto">
-                {article.description && (
-                  <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">
-                    {article.description}
-                  </p>
-                )}
-                <div className="flex items-center text-sm font-medium text-muted-foreground transition-colors group-hover:text-primary">
-                  Read full story
-                  <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <div className="mt-auto">
+                  {article.description && (
+                    <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">
+                      {article.description}
+                    </p>
+                  )}
+                  <div className="flex items-center text-sm font-medium text-muted-foreground transition-colors group-hover:text-primary">
+                    Read full story
+                    <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </div>
                 </div>
               </div>
             </div>
