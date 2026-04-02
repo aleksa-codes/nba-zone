@@ -26,8 +26,8 @@ export default async function ChazNBAPage() {
             Chaz NBA
           </h1>
           <p className="mt-4 text-lg font-medium text-muted-foreground">
-            Recent analysis and coverage. Showing the latest 12 videos from
-            YouTube&apos;s best NBA channel.
+            Recent analysis and coverage. Showing the latest 12 videos from my
+            favorite NBA channel.
           </p>
         </div>
         <Link
@@ -41,7 +41,7 @@ export default async function ChazNBAPage() {
             className="gap-2 rounded-xl bg-red-600 font-bold text-white shadow-md transition-all duration-300 hover:scale-105 hover:bg-red-700"
           >
             <Play className="h-5 w-5 fill-current" />
-            Visit Channel
+            Visit Chaz NBA
           </Button>
         </Link>
       </div>
