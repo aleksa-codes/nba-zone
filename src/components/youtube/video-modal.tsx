@@ -7,9 +7,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Eye, Play } from "lucide-react"
+import { Eye, Play, Clock } from "lucide-react"
+import { formatDistanceToNowStrict } from "date-fns"
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface VideoModalProps {
   videoId: string
@@ -27,6 +28,12 @@ export function VideoModal({
   pubDate,
 }: VideoModalProps) {
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 0)
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -50,17 +57,23 @@ export function VideoModal({
             <h3 className="mb-3 text-base leading-tight font-bold transition-colors group-hover:text-primary">
               {title}
             </h3>
-            <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Eye className="h-3 w-3" />
+            <div className="mt-auto flex items-center justify-between gap-2 text-xs font-medium text-muted-foreground overflow-hidden">
+              <span className="flex shrink-0 items-center gap-1.5 rounded-md bg-secondary/50 px-2 py-0.5">
+                <Eye className="h-3.5 w-3.5" />
                 {views}
               </span>
-              <span>
-                {new Date(pubDate).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
+              <span className="flex items-center gap-1.5 rounded-md bg-secondary/50 px-2 py-0.5 truncate">
+                <Clock className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">
+                  {mounted ? (
+                    formatDistanceToNowStrict(new Date(pubDate), { addSuffix: true })
+                  ) : (
+                    new Date(pubDate).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })
+                  )}
+                </span>
               </span>
             </div>
           </div>
