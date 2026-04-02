@@ -6,7 +6,6 @@ import {
   getYesterdaysMatches,
 } from "@/lib/services/espnService"
 import { getNBADate } from "@/lib/utils"
-import { Game } from "@/types"
 import { useQuery } from "@tanstack/react-query"
 import { format } from "date-fns"
 import { CalendarDays, RefreshCw } from "lucide-react"
@@ -14,13 +13,7 @@ import { useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { MatchCard, MatchCardSkeleton } from "./match-card"
 
-export function MatchBoard({
-  initialData,
-  initialYesterdayData,
-}: {
-  initialData: Game[]
-  initialYesterdayData: Game[]
-}) {
+export function MatchBoard() {
   const [activeTab, setActiveTab] = useState("today")
 
   const {
@@ -31,7 +24,6 @@ export function MatchBoard({
   } = useQuery({
     queryKey: ["todaysMatches"],
     queryFn: () => getTodaysMatches(),
-    initialData: initialData,
     refetchInterval: (query) => {
       const hasLiveGames = query.state.data?.some((g) => g.gameStatus === 2)
       return hasLiveGames ? 30000 : false
@@ -49,7 +41,6 @@ export function MatchBoard({
   } = useQuery({
     queryKey: ["yesterdaysMatches"],
     queryFn: () => getYesterdaysMatches(),
-    initialData: initialYesterdayData,
     staleTime: 1000 * 60 * 60 * 24, // 24 hours since it's the past
     refetchOnWindowFocus: false,
   })
@@ -124,7 +115,7 @@ export function MatchBoard({
 
       <div className="min-h-[400px]">
         {isLoading && !games.length ? (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
             <MatchCardSkeleton />
             <MatchCardSkeleton />
             <MatchCardSkeleton />
@@ -139,7 +130,7 @@ export function MatchBoard({
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
             {games.map((game) => (
               <MatchCard key={game.gameId} game={game} />
             ))}

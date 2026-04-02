@@ -159,7 +159,8 @@ export const getMatchesByDate = async (date: Date): Promise<Game[]> => {
     const dateString = `${year}${month}${day}`
 
     const response = await fetch(
-      `${ESPN_SCOREBOARD_API_URL}?dates=${dateString}&limit=100&cb=${new Date().getTime()}`
+      `${ESPN_SCOREBOARD_API_URL}?dates=${dateString}&limit=100`,
+      { next: { revalidate: 3600 } }
     )
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)

@@ -3,12 +3,13 @@ import {
   getTodaysMatches,
   getYesterdaysMatches,
 } from "@/lib/services/espnService"
-import { Game } from "@/types"
 import {
   HydrationBoundary,
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query"
+
+export const revalidate = 3600 // Revalidate every hour on the server
 
 export default async function Home() {
   const queryClient = new QueryClient()
@@ -25,18 +26,10 @@ export default async function Home() {
     }),
   ])
 
-  const todaysMatches =
-    queryClient.getQueryData<Game[]>(["todaysMatches"]) || []
-  const yesterdaysMatches =
-    queryClient.getQueryData<Game[]>(["yesterdaysMatches"]) || []
-
   return (
     <main className="container py-8">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <MatchBoard
-          initialData={todaysMatches}
-          initialYesterdayData={yesterdaysMatches}
-        />
+        <MatchBoard />
       </HydrationBoundary>
     </main>
   )
