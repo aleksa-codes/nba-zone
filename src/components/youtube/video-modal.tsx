@@ -18,6 +18,7 @@ interface VideoModalProps {
   thumbnail: string
   views: string
   pubDate: string
+  channelName?: string
 }
 
 export function VideoModal({
@@ -26,6 +27,7 @@ export function VideoModal({
   thumbnail,
   views,
   pubDate,
+  channelName,
 }: VideoModalProps) {
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -54,9 +56,16 @@ export function VideoModal({
             </div>
           </div>
           <div className="flex flex-1 flex-col justify-between border-t border-border p-5">
-            <h3 className="mb-3 text-base leading-tight font-bold transition-colors group-hover:text-primary">
-              {title}
-            </h3>
+            <div>
+              {channelName && (
+                <p className="mb-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                  {channelName}
+                </p>
+              )}
+              <h3 className="mb-3 text-base leading-tight font-bold transition-colors group-hover:text-primary">
+                {title}
+              </h3>
+            </div>
             <div className="mt-auto flex items-center justify-between gap-2 overflow-hidden text-xs font-medium text-muted-foreground">
               <span className="flex shrink-0 items-center gap-1.5 rounded-md bg-secondary/50 px-2 py-0.5">
                 <Eye className="h-3.5 w-3.5" />
