@@ -23,7 +23,7 @@ export function SiteHeader() {
       <div className="container flex h-14 items-center">
         <div className="mr-8 hidden md:flex">
           <Link href="/" className="flex items-center space-x-2">
-            <Icon iconNode={basketball} color="orange" className="h-6 w-6" />
+            <Icon iconNode={basketball} color="#f97316" className="h-6 w-6" />
             <span className="hidden font-bold sm:inline-block">NBA Hub</span>
           </Link>
         </div>
@@ -32,7 +32,7 @@ export function SiteHeader() {
             href="/"
             className="mr-2 flex shrink-0 items-center space-x-2 md:hidden"
           >
-            <Icon iconNode={basketball} color="orange" className="h-6 w-6" />
+            <Icon iconNode={basketball} color="#f97316" className="h-6 w-6" />
             <span className="font-bold text-primary">NBA Hub</span>
           </Link>
           {NAV_LINKS.map(({ href, label }) => (
