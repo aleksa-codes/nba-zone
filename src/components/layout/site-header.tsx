@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { href: "/standings", label: "Standings" },
   { href: "/news", label: "News" },
   { href: "/chaz-nba", label: "Chaz NBA" },
+  { href: "/first-take", label: "First Take" },
 ]
 
 export function SiteHeader() {
