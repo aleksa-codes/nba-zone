@@ -31,6 +31,7 @@ src/
 ## Data Sources & APIs (Crucial for Agents)
 
 - **ESPN Unofficial API**: Used for fetching structured JSON data.
+  - **Full API Documentation**: Checkout `espn-api-docs.md` in the root folder for a comprehensive list of all endpoints, parameters, and query options.
   - `https://site.api.espn.com/apis/v2/sports/basketball/nba/standings`
   - `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/[id]`
   - Always map complex ESPN stats properties directly into strictly typed interfaces (e.g. `NbaTeamStanding`, `NbaTeamDetail`) in the `src/lib/services/` directory before passing to components.

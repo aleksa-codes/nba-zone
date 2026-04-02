@@ -14,7 +14,7 @@ A fast, modern NBA dashboard presenting live standings, in-depth team statistics
 
 ## 📡 APIs & Data Providers
 
-- **ESPN Unofficial API:** Fetches live standings, team details, records, and schedules (e.g. `https://site.api.espn.com/apis/v2/sports/basketball/nba/standings`).
+- **ESPN Unofficial API:** Fetches live standings, team details, records, and schedules (e.g. `https://site.api.espn.com/apis/v2/sports/basketball/nba/standings`). See `espn-api-docs.md` for full endpoint documentation.
 - **YouTube RSS & XML:** Pulls the latest basketball videos across the internet with parsed `media:attributes` for view counts.
 - **Caching & Revalidation:** Fetches strongly rely on Next.js Server Component ISR (Incremental Static Regeneration) via `revalidate: 3600`, with TanStack React Query handling interactive client-side fetching.
 
