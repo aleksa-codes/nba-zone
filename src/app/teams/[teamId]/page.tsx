@@ -31,7 +31,7 @@ export async function generateMetadata({
   params: Promise<{ teamId: string }>
 }): Promise<Metadata> {
   const { teamId } = await params
-  const team = await getTeamDetails(teamId)
+  const team = (await getTeamDetails(teamId)) as any
 
   if (!team) {
     return {
@@ -40,8 +40,8 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${team.teamName} stats, schedule & news`,
-    description: `View ${team.teamName} roster, season stats, and upcoming schedule.`,
+    title: `${team.displayName || team.name || "Team"} stats, schedule & news`,
+    description: `View ${team.displayName || team.name || "Team"} roster, season stats, and upcoming schedule.`,
   }
 }
 
