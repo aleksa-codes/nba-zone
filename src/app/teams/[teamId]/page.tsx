@@ -20,9 +20,30 @@ import {
   Percent,
   Trophy,
 } from "lucide-react"
+import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ teamId: string }>
+}): Promise<Metadata> {
+  const { teamId } = await params
+  const team = await getTeamDetails(teamId)
+
+  if (!team) {
+    return {
+      title: "Team Not Found",
+    }
+  }
+
+  return {
+    title: `${team.teamName} stats, schedule & news`,
+    description: `View ${team.teamName} roster, season stats, and upcoming schedule.`,
+  }
+}
 
 export default async function TeamPage({
   params,

@@ -1,3 +1,9 @@
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -14,9 +20,13 @@ export function MatchCard({ game }: { game: Game }) {
 
   const date = new Date(game.gameTimeUTC)
 
+  const homeInjuries = game.homeTeam.injuries || []
+  const awayInjuries = game.awayTeam.injuries || []
+  const hasInjuries = homeInjuries.length > 0 || awayInjuries.length > 0
+
   return (
     <Card
-      className="relative w-full flex-col overflow-hidden shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
+      className="relative w-full flex-col gap-0 overflow-hidden py-0 shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
       style={{
         background: `linear-gradient(135deg, #${game.awayTeam.color}10 0%, transparent 40%, transparent 60%, #${game.homeTeam.color}10 100%)`,
       }}
@@ -150,13 +160,79 @@ export function MatchCard({ game }: { game: Game }) {
           </div>
         </div>
       </CardContent>
+
+      {hasInjuries && (
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full border-t bg-muted/10 px-6"
+        >
+          <AccordionItem value="injuries" className="border-none">
+            <AccordionTrigger className="py-2 text-xs font-semibold text-muted-foreground hover:no-underline">
+              Injury Report ({awayInjuries.length + homeInjuries.length})
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="grid grid-cols-2 gap-6 pt-2 pb-4">
+                <div>
+                  <div
+                    className="mb-2 border-b border-border/50 pb-1 text-xs font-bold"
+                    style={{ color: `#${game.awayTeam.color}` }}
+                  >
+                    {game.awayTeam.teamTricode}
+                  </div>
+                  {awayInjuries.length > 0 ? (
+                    <ul className="flex flex-col gap-1.5">
+                      {awayInjuries.map((injury, i) => (
+                        <li
+                          key={i}
+                          className="text-[11px] leading-tight break-words text-muted-foreground"
+                        >
+                          &bull; {injury}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span className="text-[11px] text-muted-foreground/60 italic">
+                      None reported
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <div
+                    className="mb-2 border-b border-border/50 pb-1 text-xs font-bold"
+                    style={{ color: `#${game.homeTeam.color}` }}
+                  >
+                    {game.homeTeam.teamTricode}
+                  </div>
+                  {homeInjuries.length > 0 ? (
+                    <ul className="flex flex-col gap-1.5">
+                      {homeInjuries.map((injury, i) => (
+                        <li
+                          key={i}
+                          className="text-[11px] leading-tight break-words text-muted-foreground"
+                        >
+                          &bull; {injury}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span className="text-[11px] text-muted-foreground/60 italic">
+                      None reported
+                    </span>
+                  )}
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      )}
     </Card>
   )
 }
 
 export function MatchCardSkeleton() {
   return (
-    <Card className="w-full shadow-sm">
+    <Card className="w-full gap-0 py-0 shadow-sm">
       <CardContent className="grid grid-cols-[1fr_auto_1fr] items-center gap-6 p-6">
         <div className="flex flex-col items-center gap-3">
           <Skeleton className="h-16 w-16 rounded-full opacity-50" />

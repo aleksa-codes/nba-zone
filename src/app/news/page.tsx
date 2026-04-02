@@ -3,6 +3,11 @@ import { getNBADate } from "@/lib/utils"
 import { format } from "date-fns"
 import { ArrowRight, Clock, Flame, Newspaper } from "lucide-react"
 
+export const metadata = {
+  title: "NBA News",
+  description: "Latest headlines and breaking stories for the NBA.",
+}
+
 export const revalidate = 3600
 
 export default async function NewsPage() {

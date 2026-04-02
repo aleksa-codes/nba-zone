@@ -13,7 +13,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 export const metadata = {
-  title: "NBA Standings | NBA Hub",
+  title: "NBA Standings",
   description: "Current NBA conference standings.",
 }
 

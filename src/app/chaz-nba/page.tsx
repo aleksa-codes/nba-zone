@@ -5,7 +5,7 @@ import { Play } from "lucide-react"
 import Link from "next/link"
 
 export const metadata = {
-  title: "Chaz NBA | NBA Hub",
+  title: "Chaz NBA",
   description: "Watch the latest videos from Chaz NBA.",
 }
 

@@ -3,7 +3,7 @@ import { getAllTeams } from "@/lib/services/espnService"
 import { Trophy } from "lucide-react"
 
 export const metadata = {
-  title: "NBA Teams | NBA Hub",
+  title: "NBA Teams",
   description: "View all NBA teams and their current stats.",
 }
 
