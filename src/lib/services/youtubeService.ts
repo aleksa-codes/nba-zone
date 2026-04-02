@@ -137,10 +137,14 @@ const fetchLatestVideosWithoutShorts = async (
   channelNameOverride: string
 ): Promise<YouTubeVideo[]> => {
   try {
-    const res = await fetch(`https://www.youtube.com/${channelHandle}/videos`, {
-      headers: { "Accept-Language": "en-US,en;q=0.9" },
-      next: { revalidate: 3600 },
-    })
+    // Add ?hl=en to enforce English relative timestamps on restricted environments like Vercel
+    const res = await fetch(
+      `https://www.youtube.com/${channelHandle}/videos?hl=en`,
+      {
+        headers: { "Accept-Language": "en-US,en;q=0.9" },
+        next: { revalidate: 3600 },
+      }
+    )
 
     if (!res.ok) return []
 
@@ -166,14 +170,37 @@ const fetchLatestVideosWithoutShorts = async (
 
     return videos.map((v, i) => {
       const videoId = v.videoId || ""
-      const fakeDate = new Date()
-      // Subtract hours based on index so it sorts chronologically
-      fakeDate.setHours(fakeDate.getHours() - i)
+      const publishedText = v.publishedTimeText?.simpleText || ""
+
+      const realDate = new Date()
+      // Translate dynamic timestamps ("6 hours ago", "2 days ago") into exact ISO dates so parsing doesn't artificially elevate videos from other channels based on overall upload frequency indexes.
+      const match = publishedText.match(
+        /(\d+)\s+(minute|hour|day|week|month|year)s?\s+ago/i
+      )
+      if (match) {
+        const amount = parseInt(match[1], 10)
+        const unit = match[2].toLowerCase()
+        if (unit === "minute")
+          realDate.setMinutes(realDate.getMinutes() - amount)
+        else if (unit === "hour")
+          realDate.setHours(realDate.getHours() - amount)
+        else if (unit === "day") realDate.setDate(realDate.getDate() - amount)
+        else if (unit === "week")
+          realDate.setDate(realDate.getDate() - amount * 7)
+        else if (unit === "month")
+          realDate.setMonth(realDate.getMonth() - amount)
+        else if (unit === "year")
+          realDate.setFullYear(realDate.getFullYear() - amount)
+      } else {
+        // Safe fallback in case regex somehow doesn't match
+        realDate.setHours(realDate.getHours() - i)
+      }
+
       return {
         id: videoId,
         title: v.title?.runs?.[0]?.text || "Untitled Video",
         link: `https://www.youtube.com/watch?v=${videoId}`,
-        pubDate: fakeDate.toISOString(),
+        pubDate: realDate.toISOString(),
         thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
         views: v.viewCountText?.simpleText?.replace(/[^0-9KMBkm]/g, "") || "0",
         channelName: channelNameOverride,
