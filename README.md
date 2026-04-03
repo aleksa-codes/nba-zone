@@ -1,4 +1,4 @@
-# NBA Hub
+# 🏀 NBA Zone
 
 A fast, modern NBA dashboard presenting live standings, in-depth team statistics, latest schedules, and up-to-date NBA news and videos. Configured as a Next.js App Router application optimized for React 19.
 

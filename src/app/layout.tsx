@@ -12,10 +12,10 @@ const fontMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | NBA Hub",
-    default: "NBA Hub - Live Scores, Standings & News",
+    template: "%s | NBA Zone",
+    default: "NBA Zone - Live Scores, Standings & News",
   },
-  description: "A minimal mobile-first NBA Hub built with Next.js 16.",
+  description: "A minimal mobile-first NBA Zone built with Next.js 16.",
 }
 
 export default function RootLayout({

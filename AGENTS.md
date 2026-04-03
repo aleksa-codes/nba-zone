@@ -1,8 +1,8 @@
-# AI Coding Agent Instructions (NBA Hub)
+# AI Coding Agent Instructions (NBA Zone)
 
 ## Project Context
 
-**NBA Hub** is a modern Next.js dashboard that displays live NBA standings, detailed team profiles (stats, schedules), and the latest NBA news/videos.
+**NBA Zone** is a modern Next.js dashboard that displays live NBA standings, detailed team profiles (stats, schedules), and the latest NBA news/videos.
 
 ## Tech Stack & Environment
 
