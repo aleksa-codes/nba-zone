@@ -32,9 +32,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { teamId } = await params
   const team = (await getTeamDetails(teamId)) as
-    | Record<string, unknown>
-    | null
-    | ReturnType<typeof JSON.parse>
+    Record<string, unknown> | null | ReturnType<typeof JSON.parse>
 
   if (!team) {
     return {
@@ -60,9 +58,7 @@ export default async function TeamPage({
   ])
 
   const team = teamInfo as
-    | Record<string, unknown>
-    | null
-    | ReturnType<typeof JSON.parse>
+    Record<string, unknown> | null | ReturnType<typeof JSON.parse>
 
   if (!team) {
     notFound()
